@@ -1,5 +1,7 @@
 using System.Text;
 using API.Data;
+using API.Entities;
+using API.Helpers;
 using API.Intefaces;
 using API.Middleware;
 using API.Services;
@@ -33,7 +35,9 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IPhotoService,PhotoService>();   
 builder.Services.AddScoped<IMemeberRepository , MemberRepository>();
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 builder.Services.AddCors();
 

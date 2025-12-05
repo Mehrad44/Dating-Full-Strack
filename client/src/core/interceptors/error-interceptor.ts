@@ -18,7 +18,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                 if(error.error.errors[key]){
                   modelSatetErrors.push(error.error.errors[key]);
                 }
-             
 
               }
                  throw modelSatetErrors.flat();
