@@ -3,6 +3,7 @@ using API.Data;
 using API.Dtos;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Intefaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,9 +16,12 @@ namespace API.Controllers
     public class MembersController(IMemeberRepository memberRepository , IPhotoService photoService) : BaseApiController
     {
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<AppUser>>> GetMembers()
+        public async Task<ActionResult<IReadOnlyList<AppUser>>> GetMembers(
+                [FromQuery]MemberParams memberParams)
         {
-            return Ok(await memberRepository.GetMembersAsync());
+            memberParams.CurrentMemberId = User.GetMemberId();
+            
+            return Ok(await memberRepository.GetMembersAsync(memberParams));
         }
 
         [HttpGet("{id}")]
@@ -91,7 +95,7 @@ namespace API.Controllers
                 member.User.ImageUrl = photo.Url;
             }
 
-            member.Phtoos.Add(photo);
+            member.Photos.Add(photo);
 
             if(await memberRepository.SaveAllAsync()) return photo;
 
@@ -105,7 +109,7 @@ namespace API.Controllers
 
             if (member == null) return BadRequest("Cannot get member from token");
 
-            var photo = member.Phtoos.SingleOrDefault(x => x.Id == photoId);
+            var photo = member.Photos.SingleOrDefault(x => x.Id == photoId);
 
            if(member.ImageUrl == photo?.Url || photo == null)
             {
@@ -129,7 +133,7 @@ namespace API.Controllers
 
             if(member == null) return BadRequest("Cannot get member from token");
 
-            var photo = member.Phtoos.SingleOrDefault(x => x.Id == photoId);     
+            var photo = member.Photos.SingleOrDefault(x => x.Id == photoId);     
 
             if(photo == null || photo.Url == member.ImageUrl)
             {
@@ -142,7 +146,7 @@ namespace API.Controllers
                 if(result.Error != null) return BadRequest(result.Error.Message); 
             }
 
-            member.Phtoos.Remove(photo);
+            member.Photos.Remove(photo);
 
             if(await memberRepository.SaveAllAsync()) return Ok();  
 

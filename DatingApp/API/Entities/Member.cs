@@ -27,7 +27,7 @@ namespace API.Entities
 
 
         [JsonIgnore]
-        public List<Photo> Phtoos {get;set;} = [];
+        public List<Photo> Photos {get;set;} = [];
 
         [JsonIgnore]
         [ForeignKey(nameof(Id))]

@@ -1,4 +1,5 @@
 using API.Entities;
+using API.Helpers;
 
 namespace API.Intefaces
 {
@@ -8,7 +9,7 @@ namespace API.Intefaces
 
         Task<bool> SaveAllAsync();
 
-        Task<IReadOnlyList<Member>> GetMembersAsync();
+        Task<PaginatedResult<Member>> GetMembersAsync(MemberParams memberParams);
 
         Task<Member?> GetMemberByIdAsync(string id);
 

@@ -1,5 +1,6 @@
 using API.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data
 {
@@ -10,6 +11,28 @@ namespace API.Data
         public DbSet<Member> Members{get;set;}
 
         public DbSet<Photo> Photos {get;set;}
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            var dateTimeConverter = new ValueConverter<DateTime , DateTime>
+            ( v=> v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            );
+
+            foreach(var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach(var propery in entityType.GetProperties())
+                {
+                    if(propery.ClrType == typeof(DateTime))
+                    {
+                        propery.SetValueConverter(dateTimeConverter);
+                    }
+                }
+            }
+           
+        }
     }
 }
             

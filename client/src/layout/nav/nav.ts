@@ -39,7 +39,7 @@ export class Nav implements OnInit{
       this.accountService.login(this.creds).subscribe({
         next : result => 
          {
-         this.router.navigateByUrl('/Members'),
+         this.router.navigateByUrl('/members'),
          this.toast.success("Logged in successfully"),
           this.creds = {};
          },
@@ -51,6 +51,7 @@ export class Nav implements OnInit{
 
   logout(){
     this.accountService.logout();
+    
     this.router.navigateByUrl('/');
 
   }
