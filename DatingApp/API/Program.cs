@@ -17,6 +17,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<LogUserActivity>();
+builder.Services.AddScoped<IMessageRepository , MessageRepository>();   
+builder.Services.AddScoped<ILikesRepository , LikesRepository> ();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

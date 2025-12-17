@@ -17,21 +17,21 @@ export class MemberService {
 
   member = signal<Member | null>(null);
 
-  getMembers(MemberParams : MemberParams){
+  getMembers(memberParams : MemberParams){
     let params = new HttpParams();
-      params = params.append('pageNumber',MemberParams.pageNumber);
-      params = params.append('pageSize',MemberParams.pageSize);
-      params = params.append('minAge',MemberParams.minAge);
-      params = params.append('maxAge',MemberParams.maxAge);
-      params = params.append('orderBy',MemberParams.orderBy);
+      params = params.append('pageNumber',memberParams.pageNumber);
+      params = params.append('pageSize',memberParams.pageSize);
+      params = params.append('minAge',memberParams.minAge);
+      params = params.append('maxAge',memberParams.maxAge);
+      params = params.append('orderBy',memberParams.orderBy);
 
-      if(MemberParams.gender) params = params.append('gender',MemberParams.gender);
+      if(memberParams.gender) params = params.append('gender',memberParams.gender);
       
 
 
     return this.http.get<PaginatedResult<Member>>(this.baseUrl+'Members' ,{params}).pipe(
       tap(()=>{
-        localStorage.setItem('filters', JSON.stringify(MemberParams))
+        localStorage.setItem('filters', JSON.stringify(memberParams))
       })
     );
   }
