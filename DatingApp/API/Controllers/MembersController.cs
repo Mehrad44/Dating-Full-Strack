@@ -72,6 +72,7 @@ namespace API.Controllers
 
 
         [HttpPost("add-photo")]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<ActionResult<Photo>> AddPhoto([FromForm] IFormFile file)
         {
             var member = await memberRepository.GetMemberForUpdate(User.GetMemberId()); 

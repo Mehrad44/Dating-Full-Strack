@@ -1,12 +1,13 @@
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data
 {
-    public class AppDbContext(DbContextOptions options) : DbContext(options)
+    public class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>(options)
     {
-        public DbSet<AppUser> Users { get; set; } 
 
         public DbSet<Member> Members{get;set;}
 
@@ -19,6 +20,13 @@ namespace API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<IdentityRole>()
+                .HasData(
+                    new IdentityRole{Id = "member-Id" , Name = "Member" , NormalizedName = "MEMBER"},   
+                    new IdentityRole{Id = "moderator-Id" , Name = "Moderator" , NormalizedName = "MODERATOR"},   
+                    new IdentityRole{Id = "admin-Id" , Name = "Admin" , NormalizedName = "ADMIN"}
+                );
 
             modelBuilder.Entity<Message>()
                 .HasOne(x => x.Recipient)

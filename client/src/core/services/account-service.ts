@@ -17,10 +17,11 @@ export class AccountService {
  
 
   register(creds : RegisterCreds){
-      return this.http.post<User>(this.baseUrl + 'Account/register',creds).pipe(
+      return this.http.post<User>(this.baseUrl + 'Account/register',creds , {withCredentials: true}).pipe(
          tap(user =>{
         if(user){
           this.setCurrentUser(user);
+           this.startTokenRefreshInterval();
         }
       })
         
@@ -31,10 +32,12 @@ export class AccountService {
 
   login(creds : LoginCreds)
   {
-    return this.http.post<User>(this.baseUrl + 'Account/login',creds).pipe(
+    return this.http.post<User>(this.baseUrl + 'Account/login',
+      creds , {withCredentials: true}).pipe(
       tap(user =>{
         if(user){
           this.setCurrentUser(user);
+          this.startTokenRefreshInterval();
         }
       })
         
@@ -43,17 +46,43 @@ export class AccountService {
 
   }
 
+  refreshToken(){
+    return this.http.post<User>(this.baseUrl + 'Account/refresh-token'
+      , {} , {withCredentials: true})
+  }
+
+  startTokenRefreshInterval(){
+    setInterval(() =>{
+      this.http.post<User>(this.baseUrl + 'Account/refresh-token'
+      , {} , {withCredentials: true}).subscribe({
+        next : user =>{
+          this.setCurrentUser(user);
+        },
+        error: () =>{
+          this.logout();
+        }
+      })
+    }, 5 * 60 * 1000)
+
+  }
+
   setCurrentUser(user:User){
-           localStorage.setItem('user', JSON.stringify(user));
+           user.roles = this.getRolesFromToken(user);
           this.currentUser.set(user);
           this.likesService.getLikeIds();
   }
 
   logout(){
-    localStorage.removeItem('user');
     localStorage.removeItem('filters');
     this.likesService.clearLikeIds();
     this.currentUser.set(null);
+  }
+
+  private getRolesFromToken(user : User) : string[]{
+    const playload = user.token.split('.')[1];
+    const decoded = atob(playload);
+    const jsonPayload = JSON.parse(decoded)
+    return Array.isArray(jsonPayload.role) ? jsonPayload.role : [jsonPayload.role]
   }
 
 }
