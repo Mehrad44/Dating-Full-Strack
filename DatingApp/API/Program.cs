@@ -5,6 +5,7 @@ using API.Helpers;
 using API.Intefaces;
 using API.Middleware;
 using API.Services;
+using API.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false
         };
 
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) &&
+                  path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+
     });
 
 builder.Services.AddAuthorizationBuilder()
@@ -42,6 +59,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddSignalR();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPhotoService,PhotoService>();   
 builder.Services.AddScoped<IMemeberRepository , MemberRepository>();
@@ -51,10 +69,9 @@ builder.Services.AddIdentityCore<AppUser>(opt =>
     opt.Password.RequireNonAlphanumeric = false;
     opt.User.RequireUniqueEmail = true;
 })
-
-
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<AppDbContext>();  
+
 
 
 builder.Services.AddCors();
@@ -78,6 +95,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<PresenceHub>("hubs/presence");
+
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
