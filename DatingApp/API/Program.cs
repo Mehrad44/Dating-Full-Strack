@@ -18,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<PresenceTracker>();
 builder.Services.AddScoped<LogUserActivity>();
 builder.Services.AddScoped<IMessageRepository , MessageRepository>();   
 builder.Services.AddScoped<ILikesRepository , LikesRepository> ();
@@ -96,7 +97,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<PresenceHub>("hubs/presence");
-
+app.MapHub<MessageHub>("hubs/messages");
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
@@ -106,6 +107,7 @@ try
     var userManager = services.GetRequiredService<UserManager<AppUser>>();
 
     await context.Database.MigrateAsync();
+    await context.Connections.ExecuteDeleteAsync();
     await Seed.SeedUsers(userManager);
 }
 catch (System.Exception ex)
