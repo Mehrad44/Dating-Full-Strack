@@ -19,9 +19,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<PresenceTracker>();
+builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
 builder.Services.AddScoped<LogUserActivity>();
-builder.Services.AddScoped<IMessageRepository , MessageRepository>();   
-builder.Services.AddScoped<ILikesRepository , LikesRepository> ();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -63,7 +63,6 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 builder.Services.AddSignalR();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPhotoService,PhotoService>();   
-builder.Services.AddScoped<IMemeberRepository , MemberRepository>();
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddIdentityCore<AppUser>(opt =>
 {

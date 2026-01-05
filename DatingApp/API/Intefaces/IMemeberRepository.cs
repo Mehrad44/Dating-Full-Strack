@@ -7,7 +7,6 @@ namespace API.Intefaces
     {
         void Update(Member member);
 
-        Task<bool> SaveAllAsync();
 
         Task<PaginatedResult<Member>> GetMembersAsync(MemberParams memberParams);
 

@@ -97,10 +97,6 @@ namespace API.Data
         }
 
 
-        public async Task<bool> SaveAllAsync()
-        {
-            return await context.SaveChangesAsync() > 0;
-        }
 
     }
 }

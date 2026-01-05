@@ -16,7 +16,6 @@ namespace API.Intefaces
 
          Task<IReadOnlyList<MessageDto>> GetMessageThread(string currentMemberId , string recipientId);
 
-         Task<bool> SaveAllAsync();
 
          void AddGroup(Group group);
 
