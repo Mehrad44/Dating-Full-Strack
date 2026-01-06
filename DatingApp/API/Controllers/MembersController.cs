@@ -40,7 +40,8 @@ namespace API.Controllers
         [HttpGet("{id}/photos")]
         public async Task<ActionResult<IReadOnlyList<Photo>>> GetMemberPhotos(string id)
         {
-            return Ok(await uow.MemeberRepository.GetPhotosForMemberAsync(id));
+            var isCurrentUser = User.GetMemberId() == id;
+            return Ok(await uow.MemeberRepository.GetPhotosForMemberAsync(id, isCurrentUser));
         }
 
         [HttpPut]
@@ -72,36 +73,29 @@ namespace API.Controllers
 
 
         [HttpPost("add-photo")]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<ActionResult<Photo>> AddPhoto([FromForm] IFormFile file)
+        public async Task<ActionResult<Photo>> AddPhoto(IFormFile file)
         {
-            var member = await uow.MemeberRepository.GetMemberForUpdate(User.GetMemberId()); 
+            var member = await uow.MemeberRepository
+                .GetMemberForUpdate(User.GetMemberId());
 
-            if(member == null) return BadRequest("Could not upadate member");
+            if (member == null) return BadRequest("Cannot update user");
 
             var result = await photoService.UploadPhotoAsync(file);
-
-            if(result.Error != null) return BadRequest(result.Error.Message);   
+            if (result.Error != null) return BadRequest(result.Error.Message);
 
             var photo = new Photo
             {
                 Url = result.SecureUrl.AbsoluteUri,
                 PublicId = result.PublicId,
-                MemberId = User.GetMemberId(),
+                MemberId = User.GetMemberId()
             };
-
-            if(member.ImageUrl == null)
-            {
-                member.ImageUrl = photo.Url;
-                member.User.ImageUrl = photo.Url;
-            }
 
             member.Photos.Add(photo);
 
-            if(await uow.Complete()) return photo;
-
+            if (await uow.Complete()) return photo;
             return BadRequest("Problem adding photo");
         }
+
 
         [HttpPut("set-main-photo/{photoId}")]
         public async Task<ActionResult<Member>> SetMainPhoto(int photoId)

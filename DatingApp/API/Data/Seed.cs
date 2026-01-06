@@ -51,7 +51,8 @@ namespace API.Data
                 user.Member.Photos.Add(new Photo
                 {
                     Url = member.ImageUrl!,
-                    MemberId = member.Id
+                    MemberId = member.Id,
+                    IsApproved = true
                     
                 });
 

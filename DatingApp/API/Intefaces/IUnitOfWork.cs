@@ -8,6 +8,8 @@ namespace API.Intefaces
 
          ILikesRepository LikesRepository { get; }
 
+         IPhotoRepository PhotoRepository { get; }  
+
          Task<bool> Complete();
 
          bool HasChanges();

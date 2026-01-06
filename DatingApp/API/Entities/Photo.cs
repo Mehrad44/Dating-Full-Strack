@@ -10,6 +10,8 @@ namespace API.Entities
 
         public string? PublicId{get;set;}
 
+        public bool IsApproved { get; set; }
+
 
         [JsonIgnore]
         public Member member {get;set;} = null!;
