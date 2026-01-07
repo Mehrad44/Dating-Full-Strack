@@ -17,7 +17,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<PresenceTracker>();
 builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
 builder.Services.AddScoped<LogUserActivity>();
@@ -57,7 +56,7 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator"));
 builder.Services.AddDbContext<AppDbContext>(opt =>
 {
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddSignalR();
@@ -85,18 +84,18 @@ x.AllowAnyHeader()
 .AllowAnyMethod()
 .AllowCredentials()
 .WithOrigins("http://localhost:4200", "https://localhost:4200"));
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapControllers();
 app.MapHub<PresenceHub>("hubs/presence");
 app.MapHub<MessageHub>("hubs/messages");
+app.MapFallbackToController("Index","Fallback");
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
